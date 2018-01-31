@@ -1,0 +1,34 @@
+# version 3
+version: "3"
+
+# declarando o serviço [wordpress]
+services:
+ nginx:
+  image: registry.tgl.com/nginx:4.0.516
+  command: ./start.sh
+  networks:
+   - tgl
+  dns:
+   - 10.0.1.68
+  deploy:
+   labels:
+    - "traefik.port=80"
+    - "traefix.port=443"
+    - "traefik.frontend.entryPoints=http,https"
+    - "traefik.frontend.rule=Host:tutoriaisgnulinux.com,www.tutoriaisgnulinux.com,tutoriaisgnulinux.com.br"
+   replicas: 2
+   update_config:
+    parallelism: 1
+   restart_policy:
+    condition: on-failure
+    delay: 10s
+    max_attempts: 5
+    window: 180s
+
+# network
+networks:
+ tgl:
+  driver: overlay
+  ipam:
+   config:
+    - subnet: 10.10.10.0/24
